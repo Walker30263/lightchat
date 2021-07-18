@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto:wght@900&family=Montserrat:wght@300&family=Oxanium:wght@300&display=swap');
+
+/*   SUGGESTIONS.HTML   */
+
+#suggestionsForm {
+  text-align: center;
+}
+
+#suggestionSent {
+  display: none;
+  text-align: center;
+}
+
+#suggestion {
+  background-color: #4caf50;
+  padding: 10px;
+}
+
+#btnSuggest {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  border-radius: 50px;
+  margin-top: 10px;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  font-family: 'Oxanium', sans-serif;
+}
+
+a {
+  color: #4CAF50;
+}
