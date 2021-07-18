@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="stylesheet" type="text/css" href="/suggestions.css" /> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="idk" />
+
+    <meta property="og:title" content="LightChat Suggestions" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lightchat.tk/suggestions.html" />
+    <meta property="og:description" content="Suggest Ideas for LightChat" />
+    <meta
+      property="og:image"
+      content="https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fa4ee71f481b6445da1cf88f8e4cd3983.png?v=1626225572793"
+    />
+    <meta name="theme-color" content="#66C0FF" />
+
+    <link
+      rel="icon"
+      type="image/png"
+      href="https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fa4ee71f481b6445da1cf88f8e4cd3983%20(1).png?v=1626225577574"
+    />
+
+    <title>LightChat Suggestions</title>
+  </head>
+  <body>
+    <div id="info">
+      <h1 id="top">
+        Suggest a new LightChat feature!
+      </h1>
+    </div>
+    <div id="sugFormContainer">
+      <form id="suggestionsForm" action="/suggestions">
+        Give us a way to contact you if needed (such as your Discord username)
+        <input id="contact">
+        <br><br>
+        Enter your suggestion (Be detailed):
+        <br>
+        <textarea id="suggestion" rows="10" cols="40" required></textarea>
+        <br>
+        <button id="btnSuggest">Suggest</button>
+      </form>
+      <br>
+      <div id="suggestionSent">
+        Your suggestion was succesfully sent!
+        <br>
+        <a href="/">Back to main page</a>
+      </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+      
+      var suggestionsForm = document.getElementById("suggestionsForm");
+      
+      suggestionsForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        
+        var contact = document.getElementById("contact").value || "Didn't give anything"; //how bout smth that says ayo actually type somthing lol like on the page
+        var suggestion = document.getElementById("suggestion").value;                      //eh i made the suggestion required not the contact info
+        
+        socket.emit("suggestion", contact, suggestion);
+        
+        document.getElementById("contact").value = "";
+        document.getElementById("suggestion").value = "";
+        
+        document.getElementById("suggestionSent").style.display = "block";
+      });
+      
+      
+      document.addEventListener("mousemove", function(e) {
+        var cx = e.clientX / 25;
+        var cy = e.clientY / 25;
+        document.getElementById("top").style.textShadow =
+          -1.5 * cx + "px " + -1.5 * cy + "px 10px gray";
+      });
+    </script>
+  </body>
+</html>
