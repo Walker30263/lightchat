@@ -1,5 +1,6 @@
 # [lightchat](https://lightchat.tk)
 
+# [Suggest a new feature](https://lightchat.tk/suggestions)
 
 ## Lightweight real-time chat app made with node.js and socket.io
 ### Public and Private chat rooms that you can make and join
@@ -48,5 +49,3 @@
             <td>!setColor crimson</td>
           </tr>
         </table>
-
-# [Suggest a new feature](https://lightchat.tk/suggestions)
