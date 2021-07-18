@@ -48,4 +48,4 @@
             <td>!setColor crimson</td>
           </tr>
         </table>
-## [Suggest a new feature](https://lightchat.tk/suggestions)
+# [Suggest a new feature](https://lightchat.tk/suggestions)
