@@ -21,6 +21,10 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
+const { Webhook, MessageBuilder } = require('discord-webhook-node');
+const hook = new Webhook(process.env.W_ID_DISCORD); //uses a Discord webhook to send suggestions to the developers
+//if you're recreating this, put the webhook link instead of "process.env.W_ID_DISCORD"
+
 app.use(express.static("public"));
 
 var rooms = []; //Array of Rooms
@@ -48,6 +52,10 @@ setInterval(function() {
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
+
+app.get('/suggestions', (req, res) => {
+  res.sendFile(__dirname + '/views/suggestions.html');
+})
 
 io.on('connection', (socket) => {
   console.log("An user connected!");
@@ -237,6 +245,17 @@ io.on('connection', (socket) => {
       socket.emit("addRoomToList", rn, getOnlineUsers(rn));
     });
   });
+  
+  socket.on("suggestion", (contact, suggestion) => {
+    const embed = new MessageBuilder()
+      .setTitle("New Suggestion")
+      .setColor("#FF00FF")
+      .addField("Contact method:", contact)
+      .addField("Suggestion: ", suggestion)
+      .setTimestamp();
+    
+    hook.send(embed);
+  })
 });
 
 server.listen(3000, () => {
