@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="idk" />
+
+    <meta property="og:title" content="LightChat" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lightchat.tk" />
+    <meta property="og:description" content="A simple real-time chat app!" />
+    <meta
+      property="og:image"
+      content="https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fa4ee71f481b6445da1cf88f8e4cd3983.png?v=1626225572793"
+    />
+    <meta name="theme-color" content="#66C0FF" />
+
+    <link
+      rel="icon"
+      type="image/png"
+      href="https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fa4ee71f481b6445da1cf88f8e4cd3983%20(1).png?v=1626225577574"
+    />
+
+    <title>LightChat</title>
+  </head>
+  <body>
+    <div id="chatElementsContainer">
+      <ul id="messages"></ul>
+      <form id="messageForm" action="IF_UR_SEEING_THIS_WE_MESSED_UP">
+        <input id="messageInput" autocomplete="off" />
+        <!--         <input id="fileInput" type="file" style="display: none;">
+        <label for="fileInput" id="fileInputIcon">
+          <img src="https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fupload.png?v=1626307184837">
+        </label> -->
+        <button>Send</button>
+      </form>
+    </div>
+    <div id="info">
+      <h1 id="top">
+        Welcome to LightChat!
+      </h1>
+    </div>
+    <div class="flex-container" id="joinOrMake">
+      <div>
+        <b>Enter Username:</b><br />
+        <input id="username" />
+      </div>
+      <br />
+      <div class="flex-container-privateRooms">
+        <div>
+          <b>Join Private Room</b><br><br>
+          <form id="joinRoom" action="/">
+            Enter room name:
+            <input id="joiningRoomName" autocomplete="off" /><br /><br>
+            Enter room code/password:
+            <input id="joiningRoomCode" autocomplete="off" /><br />
+            <button>Join</button>
+          </form>
+        </div>
+        <div>
+          <b>Make Private Room</b><br><br>
+          <form id="makeRoom" action="/">
+            What do you want to name the room?
+            <input id="roomName" autocomplete="off" /><br /> <br>
+            Room password?
+            <input id="roomPassword" autocomplete="off" /><br />
+            <button>Make</button>
+          </form>
+        </div>
+      </div>
+      <div class="flex-container-publicRooms">
+        <div>
+          <b>Make Public Room</b>
+          <form id="makePublicRoom" action="/">
+            What do you want to name the public room?
+            <input id="publicRoomName" autocomplete="off" /><br />
+            <button>Make Public Room</button>
+          </form>
+        </div>
+        <div id="publicRooms">
+          <h4>
+            Public Rooms
+          </h4>
+          <ul id="publicRoomList"></ul>
+        </div>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var ping = new Audio(
+        "https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fding.wav?v=1626265227101"
+      );
+
+      var socket = io();
+
+      window.onload = function() {
+        var username = localStorage.getItem("username");
+        if (localStorage.getItem("username")) {
+          document.getElementById("username").value = username;
+        }
+      };
+
+      var joinRoom = document.getElementById("joinRoom");
+      var makeRoom = document.getElementById("makeRoom");
+      var makePublicRoom = document.getElementById("makePublicRoom");
+      var messageForm = document.getElementById("messageForm");
+      var messageInput = document.getElementById("messageInput");
+
+      var isOnTab = document.visibilityState === "visible";
+
+      document.addEventListener("visibilitychange", function() {
+        isOnTab = document.visibilityState === "visible";
+      });
+
+      joinRoom.addEventListener("submit", function(e) {
+        e.preventDefault();
+        var joiningRoomName = document.getElementById("joiningRoomName").value;
+        var joiningRoomCode = document.getElementById("joiningRoomCode").value;
+        var username = document.getElementById("username").value || "Unnamed";
+        if (document.getElementById("username").value) {
+          localStorage.removeItem("username");
+          localStorage.setItem(
+            "username",
+            document.getElementById("username").value
+          );
+        }
+        socket.emit("joinRoom", joiningRoomName, joiningRoomCode, username);
+        document.getElementById("joiningRoomName").value = "";
+        document.getElementById("joiningRoomCode").value = "";
+        document.getElementById("username").value = "";
+      });
+
+      makeRoom.addEventListener("submit", function(e) {
+        e.preventDefault();
+        var roomName = document.getElementById("roomName").value;
+        var roomPassword = document.getElementById("roomPassword").value;
+        var username = document.getElementById("username").value || "Unnamed";
+        if (document.getElementById("username").value) {
+          localStorage.removeItem("username");
+          localStorage.setItem(
+            "username",
+            document.getElementById("username").value
+          );
+        }
+        socket.emit("makeRoom", roomName, roomPassword, username);
+        document.getElementById("roomName").value = "";
+        document.getElementById("roomPassword").value = "";
+        document.getElementById("username").value = "";
+      });
+
+      makePublicRoom.addEventListener("submit", function(e) {
+        e.preventDefault();
+        var publicRoomName = document.getElementById("publicRoomName").value;
+        var username = document.getElementById("username").value || "Unnamed";
+        if (document.getElementById("username").value) {
+          localStorage.removeItem("username");
+          localStorage.setItem(
+            "username",
+            document.getElementById("username").value
+          );
+        }
+        socket.emit("makePublicRoom", publicRoomName, username);
+        document.getElementById("publicRoomName").value = "";
+        document.getElementById("username").value = "";
+      });
+
+      socket.on("alert", function(message) {
+        alert(message);
+      });
+
+      socket.on("changeTitle", function(newTitle) {
+        document.title = newTitle;
+      });
+
+      socket.on("removeOtherElements", function() {
+        document.getElementById("joinOrMake").style.display = "none";
+        document.getElementById("info").style.display = "none";
+
+        document.getElementById("chatElementsContainer").style.display =
+          "block";
+
+        document.body.style.background = "#5a5f67";
+
+        window.scrollTo(0, 0);
+      });
+
+      socket.emit("getPublicRooms");
+      socket.on("addRoomToList", function(publicRoomName, onlineMembers) {
+        var ul = document.getElementById("publicRoomList");
+        var div = document.createElement("div");
+        var li = document.createElement("li");
+        li.innerHTML = publicRoomName + " <br> " + onlineMembers + " online";
+        var btn = document.createElement("button");
+        btn.innerHTML = "Join";
+
+        div.appendChild(li);
+        div.appendChild(btn);
+
+        btn.addEventListener("click", () => {
+          var username = document.getElementById("username").value || "Unnamed";
+          if (document.getElementById("username").value) {
+            localStorage.removeItem("username");
+            localStorage.setItem(
+              "username",
+              document.getElementById("username").value
+            );
+          }
+          socket.emit("joinRoom", publicRoomName, "publicRoom", username);
+        });
+
+        ul.appendChild(div);
+      });
+
+      socket.on("newMessage", function(message, content) {
+        var newMessageElement = document.createElement("li");
+        newMessageElement.innerHTML = message;
+        messages.appendChild(newMessageElement);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      socket.on("ping", function() {
+        if (!isOnTab) {
+          ping.play();
+        }
+      });
+
+      socket.on("systemMessage", function(message, content) {
+        var newMessageElement = document.createElement("li");
+        newMessageElement.innerHTML =
+          "<br><span class='system'><b> SYSTEM:  " +
+          message +
+          "</b></span><br>";
+        messages.appendChild(newMessageElement);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      messageForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        if (messageInput.value) {
+          socket.emit("newMessage", messageInput.value, messageInput.value);
+          messageInput.value = "";
+        }
+      });
+
+      function display() {
+        socket.emit("displayRooms");
+      }
+
+      document.addEventListener("mousemove", function(e) {
+        var cx = e.clientX / 25;
+        var cy = e.clientY / 25;
+        document.getElementById("top").style.textShadow =
+          -1.5 * cx + "px " + -1.5 * cy + "px 10px gray";
+      });
+    </script>
+  </body>
+</html>
