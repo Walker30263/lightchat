@@ -1,0 +1,293 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto:wght@900&family=Montserrat:wght@300&family=Oxanium:wght@300&display=swap');
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding-bottom: 3rem;
+  background-color: #36393e;
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+}
+h1 {
+  text-align: center;
+}
+h2 {
+  text-align: center;
+}
+
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.flex-container > div {
+  border-radius: 10px;
+  background-color: #66c0ff;
+  padding: 20px;
+  margin: 30px;
+}
+.flex-container > div:hover {
+  background-color: DodgerBlue;
+}
+
+.flex-container-privateRooms {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.flex-container-privateRooms > div {
+  border-radius: 10px;
+  background-color: DodgerBlue;
+  padding: 20px;
+  margin: 30px;
+}
+.flex-container-privateRooms > div:hover {
+  background-color: #1873CC;
+}
+
+.flex-container-publicRooms {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.flex-container-publicRooms > div {
+  border-radius: 10px;
+  background-color: DodgerBlue;
+  padding: 20px;
+  margin: 30px;
+}
+.flex-container-publicRooms > div:hover {
+  background-color: #1873CC;
+}
+
+#chatElementsContainer {
+  display: none;
+  margin: 5vh 5vh 0 5vw;
+  border: 1px solid black;
+  padding: 10px 10px 10px 10px;
+  border-radius: 5px;
+  background-color: #36393e;
+  min-height: 85vh;
+}
+
+#messageForm {
+  background: #000000;
+  padding: 0.25rem;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  height: 3rem;
+  width: calc(100vw - 24px);
+  box-sizing: border-box;
+  backdrop-filter: blur(10px);
+}
+
+#messageInput {
+  border: none;
+  padding: 0 1rem;
+  flex-grow: 1;
+  border-radius: 2rem;
+  margin: 0.25rem;
+}
+
+#messageInput:focus {
+  background: #c7d6ff;
+}
+
+#messageForm > button {
+  background: #b700ff;
+  border: none;
+  padding: 0 1rem;
+  margin: 0.25rem;
+  border-radius: 3px;
+  outline: none;
+  color: #fff; 
+}
+
+#fileInputIcon {
+  background-color: #b700ff;
+}
+
+#messageForm > button:hover {
+  background: #a500e6;
+}
+
+#messages {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  color: #fff;
+}
+
+#messages > li {
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  word-break: break-all;
+}
+
+#top {
+  font-size: 10vh;
+  font-family: "Oxanium", sans-serif;
+}
+
+#joinRoom > button {
+  background-color: #4CAF50;
+  border-radius: 5px;
+  border: solid #4CAF50 1px;
+  color: white;
+  padding: 5px 16px;
+  margin-top: 2.5vw;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+}
+
+#joinRoom > button:hover {
+  background-color: #3d8b40;
+  border: solid #3d8b40 1px;
+}
+
+#makePublicRoom > button {
+  background-color: darkblue;
+  border-radius: 5px;
+  border: solid darkblue 1px;
+  color: white;
+  padding: 5px 16px;
+  margin-top: 2.5vw;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+}
+
+#makePublicRoom > button:hover {
+  background-color: #00006F;
+}
+
+#makeRoom > button {
+  background-color: darkblue;
+  border-radius: 5px;
+  border: solid darkblue 1px;
+  color: white;
+  padding: 5px 16px;
+  margin-top: 2.5vw;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+}
+
+#makeRoom > button:hover {
+  background-color: #00006F;
+}
+
+#messages > li:hover {
+  background-color: gray;
+}
+
+span.content {
+  font-family: "Open Sans", sans-serif;
+}
+
+#publicRoomList {
+  list-style-type: none;
+}
+
+#publicRoomList > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 5px;
+}
+
+#publicRoomList > div > button {
+  margin-left: 5vw;
+  background-color: green;
+  border-radius: 5px;
+  border: solid darkblue 1px;
+  color: white;
+  padding: 5px 16px;
+  text-align: center;
+  display: inline;
+  font-size: 16px;
+  float: right;
+}
+
+#publicRooms {
+  text-align: center;
+}
+
+#publicRooms > h4 {
+  text-align: center;
+  text-decoration: bold;
+}
+
+span.name {
+  font-family: "Roboto", sans-serif;
+}
+
+span.system {
+  font-family: "Open Sans", sans-serif;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 24px;
+  
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0);
+  height: 95vh;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  border: 8px solid rgba(0, 0, 0, 0);
+  background-clip: padding-box;
+  border-radius: 9999px;
+  background-color: #AAAAAA;
+  min-height: 5vh;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  border: 6px solid rgba(0, 0, 0, 0);
+  background-color: #919191;
+}
+
+input:hover {
+  background: #CCCCCC;
+  border: 1px solid #CCCCCC;
+}
+
+input {
+  border-radius: 5px;
+  border: 1px solid #fff;
+  font-family: 'Montserrat', sans-serif;
+}
+
+table {
+  font-family: 'Montserrat', sans-serif;
+  border-radius: 5px;
+  background: #b3baff;
+}
+
+td, th{
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background: #4352e6;
+  border: 1px solid #4352e6;
+}
