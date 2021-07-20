@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto:wght@900&family=Montserrat:wght@300&family=Oxanium:wght@300&display=swap');
 
+
+/*   INDEX.HTML   */
+
 html,
 body {
   margin: 0;
@@ -9,7 +12,7 @@ body {
 body {
   margin: 0;
   padding-bottom: 3rem;
-  background-color: #36393e;
+  background: linear-gradient(90deg, rgba(50,145,164,1) 0%, rgba(131,58,180,1) 36%, rgba(253,29,29,1) 100%);
   color: white;
   font-family: 'Montserrat', sans-serif;
 }
@@ -27,12 +30,18 @@ h2 {
 }
 .flex-container > div {
   border-radius: 10px;
-  background-color: #66c0ff;
+  background: linear-gradient(270deg, rgba(15,72,128,1) 0%, rgba(45,48,52,1) 100%);
   padding: 20px;
   margin: 30px;
+  box-shadow: 0px 0px 15px #0f4880;
 }
+
+.flex-container > div > div {
+  box-shadow: 0px 0px 15px #0f4880;
+}
+
 .flex-container > div:hover {
-  background-color: DodgerBlue;
+  background: linear-gradient(270deg, rgba(12,58,102,1) 0%, rgba(36,38,41,1) 100%);
 }
 
 .flex-container-privateRooms {
@@ -42,12 +51,12 @@ h2 {
 }
 .flex-container-privateRooms > div {
   border-radius: 10px;
-  background-color: DodgerBlue;
+  background: linear-gradient(266deg, rgba(12,58,102,1) 0%, rgba(36,38,41,1) 100%);
   padding: 20px;
   margin: 30px;
 }
 .flex-container-privateRooms > div:hover {
-  background-color: #1873CC;
+  background: rgba(255, 255, 255, 0); /* #FFFFFF00 is invisible  nice*/
 }
 
 .flex-container-publicRooms {
@@ -57,12 +66,12 @@ h2 {
 }
 .flex-container-publicRooms > div {
   border-radius: 10px;
-  background-color: DodgerBlue;
+  background: linear-gradient(266deg, rgba(12,58,102,1) 0%, rgba(36,38,41,1) 100%);
   padding: 20px;
   margin: 30px;
 }
 .flex-container-publicRooms > div:hover {
-  background-color: #1873CC;
+  background: rgba(255, 255, 255, 0);
 }
 
 #chatElementsContainer {
@@ -135,6 +144,10 @@ h2 {
 #top {
   font-size: 10vh;
   font-family: "Oxanium", sans-serif;
+  background: linear-gradient(90deg, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0px 0px 10px;
 }
 
 #joinRoom > button {
@@ -202,10 +215,10 @@ span.content {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid black;
   border-radius: 5px;
   padding: 10px;
   margin: 5px;
+  background: linear-gradient(90deg, rgba(113,82,105,1) 0%, rgba(152,152,152,1) 100%);
 }
 
 #publicRoomList > div > button {
@@ -240,13 +253,13 @@ span.system {
 
 /* width */
 ::-webkit-scrollbar {
-  width: 24px;
+  width: 22px;
   
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0);
+  background: #fd1d1d;
   height: 95vh;
 }
 
@@ -255,25 +268,26 @@ span.system {
   border: 8px solid rgba(0, 0, 0, 0);
   background-clip: padding-box;
   border-radius: 9999px;
-  background-color: #AAAAAA;
+  background-color: #1a1a1a;
   min-height: 5vh;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  border: 6px solid rgba(0, 0, 0, 0);
-  background-color: #919191;
+  border: 7px solid rgba(0, 0, 0, 0);
+  background-color: #000000;
 }
 
 input:hover {
-  background: #CCCCCC;
-  border: 1px solid #CCCCCC;
+  background: linear-gradient(90deg, rgba(204,204,204,1) 0%, rgba(108,108,108,1) 100%);
+  border: 1px;
 }
 
 input {
   border-radius: 5px;
-  border: 1px solid #fff;
+  border: 1px;
   font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(159,159,159,1) 100%);
 }
 
 table {
