@@ -117,7 +117,6 @@
         socket.emit("getRoomNameFromInvite", inviteCode);
         document.getElementById('joinOrMake').style.display = "none";
         document.getElementById('info').style.display = "none";
-        document.getElementById('joinViaInvite').style.display = "flex";
       } 
 
       window.onload = function() {
@@ -291,6 +290,7 @@
           let x = 5;
           document.getElementById("JVIusername").style.display = "none";
           document.getElementById("JVIjoin").style.display = "none";
+          document.getElementById('joinViaInvite').style.display = "flex";
           var countdown = setInterval(function() {
             if (x > 0) {
               document.getElementById("youHaveBeenInvited").innerHTML = "The invite link that you used is invalid. You will be redirected to the main page in " + x + " seconds."
@@ -302,7 +302,8 @@
             x--;
           }, 1000)
         } else {
-         document.getElementById("youHaveBeenInvited").innerHTML = "You have been invited to the room <b>" + roomName + "</b><br>" + "Set your username and then click the \"Join\" button to join."; 
+          document.getElementById('joinViaInvite').style.display = "flex";
+          document.getElementById("youHaveBeenInvited").innerHTML = "You have been invited to the room <b>" + roomName + "</b><br>" + "Set your username and then click the \"Join\" button to join."; 
         } 
       });
       
