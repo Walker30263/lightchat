@@ -25,7 +25,7 @@
           </tr>
           <tr>
             <td>!invite</td>
-            <td>Gets Room name and code</td>
+            <td>Gives you an invite link to the current chat room</td>
             <td>!invite</td>
           </tr>
           <tr>
