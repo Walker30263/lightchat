@@ -39,8 +39,19 @@
     </div>
     <div id="info">
       <h1 id="top">
-        Welcome to LightChat!
+        Welcome to LightChat!<br>
+        <span style="font-size: 5vh;">Sponsored by <a href="https://discord.gg/vjNgPMRJpb">Universal</a></span>
       </h1>
+    </div>
+    <div class="flex-container" id="joinViaInvite">
+      <form id="joinViaInviteForm">
+        <p id="youHaveBeenInvited"></p>
+        <div id="JVIusername">
+          <b>Enter Username:</b><br />
+          <input id="usernameWhenInvited" />
+        </div>
+        <button id="JVIjoin">Join</button>
+      </form>
     </div>
     <div class="flex-container" id="joinOrMake">
       <div>
@@ -93,19 +104,34 @@
       var ping = new Audio(
         "https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fding.wav?v=1626265227101"
       );
+      var rickRoll = new Audio("https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2FOlivia%20Rodrigo%20-%20good%204%20u%20(Pendona.com)-%5BAudioTrimmer.com%5D.mp3?v=1626967429722");
+      //var rickRoll = new Audio("https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2FNever%20Gonna%20Give%20You%20Up%20Original.mp3?v=1626908066349");
 
       var socket = io();
+      
+      var inviteCode = "";
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('inviteCode')) {
+        inviteCode = urlParams.get('inviteCode');
+        socket.emit("getRoomNameFromInvite", inviteCode);
+        document.getElementById('joinOrMake').style.display = "none";
+        document.getElementById('info').style.display = "none";
+        document.getElementById('joinViaInvite').style.display = "flex";
+      } 
 
       window.onload = function() {
         var username = localStorage.getItem("username");
         if (localStorage.getItem("username")) {
           document.getElementById("username").value = username;
+          document.getElementById("usernameInputWhenInvited").value = username;
         }
       };
 
       var joinRoom = document.getElementById("joinRoom");
       var makeRoom = document.getElementById("makeRoom");
       var makePublicRoom = document.getElementById("makePublicRoom");
+      var joinViaInviteForm = document.getElementById("joinViaInviteForm");
       var messageForm = document.getElementById("messageForm");
       var messageInput = document.getElementById("messageInput");
 
@@ -166,6 +192,21 @@
         document.getElementById("publicRoomName").value = "";
         document.getElementById("username").value = "";
       });
+      
+      joinViaInviteForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        
+        var username = document.getElementById("usernameWhenInvited").value || "Unnamed";
+        if (document.getElementById("usernameWhenInvited").value) {
+          localStorage.removeItem("usernameWhenInvited");
+          localStorage.setItem(
+            "username",
+            document.getElementById("usernameWhenInvited").value
+          );
+        }
+        
+        socket.emit("joinRoomWithInvite", inviteCode, username)
+      })
 
       socket.on("alert", function(message) {
         alert(message);
@@ -177,14 +218,14 @@
 
       socket.on("removeOtherElements", function() {
         document.getElementById("joinOrMake").style.display = "none";
+        document.getElementById("joinViaInvite").style.display = "none";
         document.getElementById("info").style.display = "none";
 
         document.getElementById("chatElementsContainer").style.display =
           "block";
 
-        document.body.style.background = "#5a5f67";
-
         window.scrollTo(0, 0);
+        addCss('/chatPage.css')
       });
 
       socket.emit("getPublicRooms");
@@ -245,16 +286,46 @@
         }
       });
 
-      function display() {
-        socket.emit("displayRooms");
-      }
-
-      document.addEventListener("mousemove", function(e) {
-        var cx = e.clientX / 25;
-        var cy = e.clientY / 25;
-        document.getElementById("top").style.textShadow =
-          -1.5 * cx + "px " + -1.5 * cy + "px 10px gray";
+      socket.on("outputRoomNameFromInvite", function(roomName) {
+        if (roomName === null) {
+          let x = 5;
+          document.getElementById("JVIusername").style.display = "none";
+          document.getElementById("JVIjoin").style.display = "none";
+          var countdown = setInterval(function() {
+            if (x > 0) {
+              document.getElementById("youHaveBeenInvited").innerHTML = "The invite link that you used is invalid. You will be redirected to the main page in " + x + " seconds."
+            }
+            else {
+              clearInterval(countdown);
+              document.location = "https://lightchat.tk"
+            }
+            x--;
+          }, 1000)
+        } else {
+         document.getElementById("youHaveBeenInvited").innerHTML = "You have been invited to the room <b>" + roomName + "</b><br>" + "Set your username and then click the \"Join\" button to join."; 
+        } 
       });
+      
+      socket.on("rickroll", function() {
+        rickRoll.load();
+        rickRoll.play();
+      });
+      
+      socket.on("rickrollStop", function() {
+        rickRoll.pause();
+      })
+      
+      function addCss(fileName) {
+
+        var head = document.head;
+        var link = document.createElement("link");
+
+        link.type = "text/css";
+        link.rel = "stylesheet";
+        link.href = fileName;
+
+        head.appendChild(link);
+      }
     </script>
   </body>
 </html>
