@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto:wght@900&family=Montserrat:wght@300&family=Oxanium:wght@300&display=swap');
+
+#chatElementsContainer {
+  display: block;
+  background: linear-gradient(180deg, #4b6cb7 0%, #182848 100%);
+  border: none;
+  box-shadow: 0px 0px 10px #4b6cb7;
+}
+
+#messages > li:hover {
+  background-color: rgba(0, 0, 0, 0.29);
+}
+
+body {
+  background: linear-gradient(90deg, #1CB5E0 0%, #000851 100%);
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 22px;
+  
+}
+
+::-webkit-scrollbar-track {
+  background: #000851;
+  height: 95vh;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 8px solid rgba(0, 0, 0, 0);
+  background-clip: padding-box;
+  border-radius: 9999px;
+  background-color: #333974;
+  min-height: 5vh;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  border: 7px solid rgba(0, 0, 0, 0);
+  background-color: #666b97;
+}
