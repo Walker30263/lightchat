@@ -10,7 +10,7 @@
 ### Invite links!
 #### In the format https://lightchat.tk/invite/{invite-code}
 ### Simple UI
-![](https://github.com/Walker30263/lightchat/blob/main/assets/ui.png?raw=true)
+![](https://github.com/Walker30263/lightchat/blob/main/assets/ui-screenshots/ui_v1-1.png?raw=true)
 ### In-chat Commands to customize your experience:
 <table>
           <tr>
