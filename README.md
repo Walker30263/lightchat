@@ -3,7 +3,6 @@
 # [Suggest a new feature](https://lightchat.tk/suggestions)
 
 ## New: Invite Links!
-![](https://github.com/Walker30263/lightchat/blob/main/assets/ui-screenshots/gettingInvited-ui_v1-1.png?raw=true)
 
 ## Lightweight real-time chat app made with node.js and socket.io
 ### Public and Private chat rooms that you can make and join
@@ -12,6 +11,7 @@
 ### Simple UI
 ![](https://github.com/Walker30263/lightchat/blob/main/assets/ui-screenshots/ui_v1-1.png?raw=true)
 ![](https://github.com/Walker30263/lightchat/blob/main/assets/ui-screenshots/chat-ui_v1-1.png?raw=true)
+![](https://github.com/Walker30263/lightchat/blob/main/assets/ui-screenshots/gettingInvited-ui_v1-1.png?raw=true)
 ### In-chat Commands to customize your experience:
 <table>
           <tr>
