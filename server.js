@@ -23,13 +23,14 @@ const io = new Server(server);
 
 const { Webhook, MessageBuilder } = require('discord-webhook-node');
 const hook = new Webhook(process.env.W_ID_DISCORD); //uses a Discord webhook to send suggestions to the developers
-//if you're recreating this, put the webhook link instead of "process.env.W_ID_DISCORD"
+//if you're recreating this, put the webhook link instead of "process.env.W_ID_DISCORD", or make a .env with W_ID_DISCORD set to the link
 
 app.use(express.static("public"));
 
 var rooms = []; //Array of Rooms
 var roomNames = []; //Array of Room Names
 var roomPasswords = []; //Array of Room Passwords
+var roomInviteCodes = []; //parallel array to hold room invites
 
 var publicRooms = []; //Array of Public Room Names for display purposes
 
@@ -42,6 +43,7 @@ let Member = class {
   }
 }
 
+
 var willThisWork = 0;
 
 setInterval(function() {
@@ -49,13 +51,19 @@ setInterval(function() {
   console.log("Up for " + willThisWork + " seconds.")
 }, 1000);
 
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
 
 app.get('/suggestions', (req, res) => {
   res.sendFile(__dirname + '/views/suggestions.html');
-})
+});
+
+app.use('/invite/:code', (req, res) => {
+  res.redirect("/?inviteCode=" + req.params.code);
+  console.log(req.params.code)
+});
 
 io.on('connection', (socket) => {
   console.log("An user connected!");
@@ -68,9 +76,8 @@ io.on('connection', (socket) => {
       rooms[roomNames.indexOf(joiningRoomName)].push(joiner);
       
       socket.join(joiningRoomName);
-      const currentRoom = getRoomName(socket.id);
       
-      io.to(currentRoom).emit("systemMessage", "A new user connected. Welcome " + getUsername(socket.id) + "! You can do !setUsername (username) to set a username. Otherwise, a randomly generated username will appear.")
+      io.to(joiningRoomName).emit("systemMessage", "A new user connected. Welcome " + getUsername(socket.id) + "! You can do !setUsername (username) to set a username. Otherwise, a randomly generated username will appear.")
       io.to(socket.id).emit("changeTitle", joiningRoomName)
     }
     else {
@@ -78,18 +85,42 @@ io.on('connection', (socket) => {
     }
   });
   
+  socket.on("joinRoomWithInvite", (inviteCode, username) => {
+    console.log("Someone wants to join with the invite " + inviteCode);
+    
+    var index = roomInviteCodes.indexOf(inviteCode);
+    var joiningRoomName = roomNames[index];
+    
+    io.to(socket.id).emit("removeOtherElements");
+    let joiner = new Member(socket.id, username);
+    
+    rooms[roomNames.indexOf(joiningRoomName)].push(joiner);
+      
+    socket.join(joiningRoomName);
+      
+    io.to(joiningRoomName).emit("systemMessage", "A new user connected. Welcome " + getUsername(socket.id) + "! You can do !setUsername (username) to set a username. Otherwise, a randomly generated username will appear.")
+    io.to(socket.id).emit("changeTitle", joiningRoomName)
+  })
+  
   socket.on("makeRoom", (roomName, roomPassword, username) => {
     console.log("Someone wants to make a room with the name " + roomName + " and password " + roomPassword);
     
     if (roomNames.includes(roomName)) {
       io.to(socket.id).emit("alert", "A room with that name already exists. Pick a new name.")
       return;
+    } else if (!roomName) {
+      io.to(socket.id).emit("alert", "Empty Room Names are not allowed")
+      return;
     }
     
     let owner = new Member(socket.id, username);
+    
     rooms.push([owner]);
     roomNames.push(roomName);
     roomPasswords.push(roomPassword);
+    roomInviteCodes.push(generateInviteCode());
+    
+    console.log(roomInviteCodes);
     
     socket.join(roomName);
     io.to(socket.id).emit("removeOtherElements");
@@ -102,6 +133,9 @@ io.on('connection', (socket) => {
     if (roomNames.includes(roomName)) {
       io.to(socket.id).emit("alert", "A room with that name already exists. Pick a new name.")
       return;
+    } else if (!roomName) {
+      io.to(socket.id).emit("alert", "Empty Room Names are not allowed")
+      return;
     }
     
     let owner = new Member(socket.id, username);
@@ -109,6 +143,7 @@ io.on('connection', (socket) => {
     rooms.push([owner]);
     roomNames.push(roomName);
     roomPasswords.push("publicRoom")
+    roomInviteCodes.push(generateInviteCode());
     
     publicRooms.push(roomName);
     
@@ -132,10 +167,10 @@ io.on('connection', (socket) => {
     } 
     else if (parts[0] == "!invite") {
       if (publicRooms.includes(currentRoom)) {
-        io.to(currentRoom).emit("systemMessage", "Requested by " + usernameDisplay(socket.id) + ":<br>This is a public room with the name " + currentRoom + ".")
+        io.to(currentRoom).emit("systemMessage", "Requested by " + usernameDisplay(socket.id) + ":<br>This is a public room with the name " + currentRoom + " and the invite link is " + getInviteLinkFromRoomName(currentRoom) + ".")
       } 
       else if ((publicRooms.includes(currentRoom) == false) && (roomNames.includes(currentRoom) == true)) {
-        io.to(currentRoom).emit("systemMessage", "Requested by " + usernameDisplay(socket.id) + ":<br>The room name is " + currentRoom + " and the room password is " + roomPasswords[roomNames.indexOf(currentRoom)])
+        io.to(currentRoom).emit("systemMessage", "Requested by " + usernameDisplay(socket.id) + ":<br>The room name is " + currentRoom + " and the room's invite link is " + getInviteLinkFromRoomName(currentRoom))
       }
     }
     else if (parts[0] == "!users") {
@@ -148,11 +183,17 @@ io.on('connection', (socket) => {
         io.to(currentRoom).emit("newMessage", usernameDisplay(socket.id) + ": " + "<span class='content' style='color: " + fixColor(parts[1]) + ";'><b>" + parts.slice(2).join(" ") + "</b></span>", parts.slice(2).join(" "));
       }
     } 
-    /*else if (message.includes("<script>")) {
+    else if (message.includes("<script>")) {
       io.to(currentRoom).emit("systemMessage", "<span style='color:red; font-weight:bold;'>" + getUsername(socket.id) + " Sent a message which contained the script tag</span>");
+    } 
+    /*else if (checkInputForHTML(parts)) {
+      io.to(currentRoom).emit("systemMessage", "Stop trying to be cool and embed HTML into the chat, " + usernameDisplay(socket.id) + "!")
     }*/
-    else if (checkInputForHTML(parts)) {
-      io.to(currentRoom).emit("systemMessage", "Stop trying to embed HTML into the chat, " + usernameDisplay(socket.id) + "!")
+    else if (parts[0] == "!rickroll") {
+      io.to(currentRoom).emit("rickroll")
+    }
+    else if (parts[0] == "!rickrollStop") {
+      io.to(currentRoom).emit("rickrollStop")
     }
     else if (parts[0] == "!getUsers") {
       io.to(currentRoom).emit("systemMessage", "The Users are: "+ getOnlineUsersNames(currentRoom).join(', '))
@@ -246,6 +287,11 @@ io.on('connection', (socket) => {
     });
   });
   
+  socket.on("getRoomNameFromInvite", (inviteCode) => {
+    var index = roomInviteCodes.indexOf(inviteCode);
+    socket.emit("outputRoomNameFromInvite", roomNames[index]);
+  });
+  
   socket.on("suggestion", (contact, suggestion) => {
     const embed = new MessageBuilder()
       .setTitle("New Suggestion")
@@ -255,7 +301,7 @@ io.on('connection', (socket) => {
       .setTimestamp();
     
     hook.send(embed);
-  })
+  });
 });
 
 server.listen(3000, () => {
@@ -358,6 +404,7 @@ function deleteRoom(rn) {
   rooms.splice(index, 1);
   roomNames.splice(index, 1);
   roomPasswords.splice(index, 1);
+  roomInviteCodes.splice(index, 1);
   
   publicRooms.splice(publicIndex, 1);
 }
@@ -395,4 +442,25 @@ function checkInputForHTML(words) {
     }
   }
   return false;
+}
+
+function generateInviteCode() {
+  var code = "";
+  for (i = 0; i < 6; i++) {
+    if (Math.random() > 0.5) {
+      code += (Math.floor(Math.random()*9) + 1)
+    } else {
+      code += "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)]
+    }
+  }
+  if (roomInviteCodes.includes(code)) {
+    generateInviteCode()
+  } else {
+    return code;
+  }
+}
+
+function getInviteLinkFromRoomName(rn) {
+  var index = roomNames.indexOf(rn);
+  return "<a href='https://lightchat.tk/invite/" + roomInviteCodes[index] + "'>https://lightchat.tk/invite/" + roomInviteCodes[index] + "</a>";
 }
