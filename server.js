@@ -1,5 +1,4 @@
 const express = require("express");
-const fetch = require('node-fetch');
 const app = express();
 
 const htmlNameArrays = require("./htmlNameArrays.js")
@@ -60,9 +59,17 @@ app.get('/suggestions', (req, res) => {
   res.sendFile(__dirname + '/views/suggestions.html');
 });
 
+app.get('/invite', (req, res) => {
+  res.redirect("/")
+});
+
 app.use('/invite/:code', (req, res) => {
   res.redirect("/?inviteCode=" + req.params.code);
   console.log(req.params.code)
+});
+
+app.get('/games', (req, res) => {
+  res.sendFile(__dirname + '/views/games/games.html')
 });
 
 io.on('connection', (socket) => {
@@ -77,7 +84,7 @@ io.on('connection', (socket) => {
       
       socket.join(joiningRoomName);
       
-      io.to(joiningRoomName).emit("systemMessage", "A new user connected. Welcome " + getUsername(socket.id) + "! You can do !setUsername (username) to set a username. Otherwise, a randomly generated username will appear.")
+      io.to(joiningRoomName).emit("systemMessage", "A new user connected. Welcome " + getUsername(socket.id) + "! You can do !setUsername (username) to set a username")
       io.to(socket.id).emit("changeTitle", joiningRoomName)
     }
     else {
@@ -98,7 +105,7 @@ io.on('connection', (socket) => {
       
     socket.join(joiningRoomName);
       
-    io.to(joiningRoomName).emit("systemMessage", "A new user connected. Welcome " + getUsername(socket.id) + "! You can do !setUsername (username) to set a username. Otherwise, a randomly generated username will appear.")
+    io.to(joiningRoomName).emit("systemMessage", "A new user connected. Welcome " + getUsername(socket.id) + "! You can do !setUsername (username) to set a username.")
     io.to(socket.id).emit("changeTitle", joiningRoomName)
   })
   
@@ -120,11 +127,11 @@ io.on('connection', (socket) => {
     roomPasswords.push(roomPassword);
     roomInviteCodes.push(generateInviteCode());
     
-    console.log(roomInviteCodes);
-    
     socket.join(roomName);
+    
     io.to(socket.id).emit("removeOtherElements");
     io.to(socket.id).emit("changeTitle", roomName);
+    io.to(roomName).emit("systemMessage", "Welcome " + getUsername(socket.id) + "! You can do !setUsername (username) to set a username. You can do !invite to get an invite link to share to your friends!");
   });
   
   socket.on("makePublicRoom", (roomName, username) => {
@@ -150,6 +157,7 @@ io.on('connection', (socket) => {
     socket.join(roomName);
     io.to(socket.id).emit("removeOtherElements");
     io.to(socket.id).emit("changeTitle", roomName)
+    io.to(roomName).emit("systemMessage", "Welcome " + getUsername(socket.id) + "! You can do !setUsername (username) to set a username. You can do !invite to get an invite link to share to your friends!");
     io.emit("addRoomToList", roomName);
   });
   
@@ -229,7 +237,7 @@ io.on('connection', (socket) => {
           </tr>
           <tr>
             <td>!invite</td>
-            <td>Gets Room name and code</td>
+            <td>Gives you an invite link to the current chat room</td>
             <td>!invite</td>
           </tr>
           <tr>
