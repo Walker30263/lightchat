@@ -197,12 +197,6 @@ io.on('connection', (socket) => {
     /*else if (checkInputForHTML(parts)) {
       io.to(currentRoom).emit("systemMessage", "Stop trying to be cool and embed HTML into the chat, " + usernameDisplay(socket.id) + "!")
     }*/
-    else if (parts[0] == "!rickroll") {
-      io.to(currentRoom).emit("rickroll")
-    }
-    else if (parts[0] == "!rickrollStop") {
-      io.to(currentRoom).emit("rickrollStop")
-    }
     else if (parts[0] == "!getUsers") {
       io.to(currentRoom).emit("systemMessage", "The Users are: "+ getOnlineUsersNames(currentRoom).join(', '))
     }
