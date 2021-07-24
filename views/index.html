@@ -103,9 +103,7 @@
       var ping = new Audio(
         "https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fding.wav?v=1626265227101"
       );
-      var rickRoll = new Audio("https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2FOlivia%20Rodrigo%20-%20good%204%20u%20(Pendona.com)-%5BAudioTrimmer.com%5D.mp3?v=1626967429722");
-      //var rickRoll = new Audio("https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2FNever%20Gonna%20Give%20You%20Up%20Original.mp3?v=1626908066349");
-
+      
       var socket = io();
       
       var inviteCode = "";
@@ -305,15 +303,6 @@
           document.getElementById("youHaveBeenInvited").innerHTML = "You have been invited to the room <b>" + roomName + "</b><br>" + "Set your username and then click the \"Join\" button to join."; 
         } 
       });
-      
-      socket.on("rickroll", function() {
-        rickRoll.load();
-        rickRoll.play();
-      });
-      
-      socket.on("rickrollStop", function() {
-        rickRoll.pause();
-      })
       
       function addCss(fileName) {
 
