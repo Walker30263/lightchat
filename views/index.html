@@ -22,6 +22,7 @@
       type="image/png"
       href="https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fa4ee71f481b6445da1cf88f8e4cd3983%20(1).png?v=1626225577574"
     />
+    
 
     <title>LightChat</title>
   </head>
@@ -98,6 +99,7 @@
       </div>
     </div>
 
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       var ping = new Audio(
@@ -204,8 +206,12 @@
         socket.emit("joinRoomWithInvite", inviteCode, username)
       })
 
-      socket.on("alert", function(message) {
-        alert(message);
+      socket.on("errorAlert", function(message) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: message
+        })
       });
 
       socket.on("changeTitle", function(newTitle) {
