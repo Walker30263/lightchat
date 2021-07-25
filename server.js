@@ -88,7 +88,7 @@ io.on('connection', (socket) => {
       io.to(socket.id).emit("changeTitle", joiningRoomName)
     }
     else {
-      io.to(socket.id).emit("alert", "Wrong username or password. Please try again.")
+      io.to(socket.id).emit("errorAlert", "Wrong room name or password. Please try again.")
     }
   });
   
@@ -113,10 +113,14 @@ io.on('connection', (socket) => {
     console.log("Someone wants to make a room with the name " + roomName + " and password " + roomPassword);
     
     if (roomNames.includes(roomName)) {
-      io.to(socket.id).emit("alert", "A room with that name already exists. Pick a new name.")
+      io.to(socket.id).emit("errorAlert", "A room with that name already exists. Pick a new name.")
       return;
     } else if (!roomName) {
-      io.to(socket.id).emit("alert", "Empty Room Names are not allowed")
+      io.to(socket.id).emit("errorAlert", "Empty Room Names are not allowed.")
+      return;
+    }
+    else if (!roomPassword) {
+      io.to(socket.id).emit("errorAlert", "Enter a password. If you don't want to make a room with a password, make a public room.")
       return;
     }
     
@@ -138,10 +142,10 @@ io.on('connection', (socket) => {
     console.log("Someone wants to make a public room with the name " + roomName);
     
     if (roomNames.includes(roomName)) {
-      io.to(socket.id).emit("alert", "A room with that name already exists. Pick a new name.")
+      io.to(socket.id).emit("errorAlert", "A room with that name already exists. Pick a new name.")
       return;
     } else if (!roomName) {
-      io.to(socket.id).emit("alert", "Empty Room Names are not allowed")
+      io.to(socket.id).emit("errorAlert", "Empty Room Names are not allowed")
       return;
     }
     
