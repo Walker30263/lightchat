@@ -43,6 +43,18 @@
         Welcome to LightChat!<br>
       </h1>
     </div>
+    <noscript>
+      <div class="javascriptNotEnabledWarning">
+        <span style="font-size: 64px;">You don't have JavaScript enabled.</span>
+        <br>
+        <span style="font-size: 30px;">Since this uses JavaScript to send/receive messages from the server, you won't be able to use it until you enable JavaScript.</span>
+      </div>
+      <style type="text/css">
+        #chatElementsContainer { display:none; }
+        #joinViaInvite { display:none; }
+        #joinOrMake { display:none; }
+      </style>
+    </noscript>
     <div class="flex-container" id="joinViaInvite">
       <form id="joinViaInviteForm">
         <p id="youHaveBeenInvited"></p>
@@ -122,7 +134,7 @@
         var username = localStorage.getItem("username");
         if (localStorage.getItem("username")) {
           document.getElementById("username").value = username;
-          document.getElementById("usernameInputWhenInvited").value = username;
+          document.getElementById("usernameWhenInvited").value = username;
         }
       };
 
@@ -257,9 +269,29 @@
         ul.appendChild(div);
       });
 
-      socket.on("newMessage", function(message, content) {
-        var newMessageElement = document.createElement("li");
-        newMessageElement.innerHTML = message;
+      socket.on("newMessage", function(message, displayOptions) {
+        let newMessageElement = document.createElement("li");
+        let messageDiv = document.createElement("div");
+        let usernameDiv = document.createElement("div");
+        
+        let usernameColor = displayOptions.usernameColor;
+        let username = displayOptions.username;
+        let messageColor = displayOptions.messageColor;
+        
+        usernameDiv.style.display = "inline-block";
+        usernameDiv.style.color = usernameColor;
+        usernameDiv.style.fontWeight = "bold";
+        usernameDiv.textContent = username;
+        
+        messageDiv.style.display = "inline-block";
+        messageDiv.style.color = messageColor;
+        messageDiv.textContent += message;
+        
+        newMessageElement.append(usernameDiv);
+        newMessageElement.append(": ");
+        newMessageElement.append(messageDiv);
+        
+        console.log(newMessageElement.innerHTML);
         messages.appendChild(newMessageElement);
         window.scrollTo(0, document.body.scrollHeight);
       });
@@ -270,12 +302,157 @@
         }
       });
 
-      socket.on("systemMessage", function(message, content) {
-        var newMessageElement = document.createElement("li");
-        newMessageElement.innerHTML =
-          "<br><span class='system'><b> SYSTEM:  " +
-          message +
-          "</b></span><br>";
+      socket.on("systemMessage", function(message) {
+        if (message.command == "!help") {
+          let newMessageElement = document.createElement("li");
+          
+          let div = document.createElement("div");
+          div.style.display = "inline-block";
+          div.style.fontWeight = "bold";
+          div.textContent = "SYSTEM: Requested by " + message.data.username;
+          
+          let tableDiv = document.createElement("div");
+          tableDiv.innerHTML = message.data.helpMessage;
+          
+          
+          newMessageElement.appendChild(div);
+          newMessageElement.appendChild(tableDiv);
+          
+          messages.appendChild(newMessageElement);
+          window.scrollTo(0, document.body.scrollHeight);
+        }
+        
+        if (message.command == "!setColor") {
+          if (message.data.failed) {
+            let newMessageElement = document.createElement("li");
+            
+            newMessageElement.style.fontWeight = "bold";
+            newMessageElement.textContent = "SYSTEM: Invalid Hex Code/Color Name"
+            
+            messages.appendChild(newMessageElement);
+            window.scrollTo(0, document.body.scrollHeight);
+          } else {
+            let newMessageElement = document.createElement("li");
+            
+            let div = document.createElement("div");
+            div.style.fontWeight = "bold";
+            div.textContent = "SYSTEM: " + message.data.username + " has changed their username color to " + message.data.newColor;
+            
+            newMessageElement.appendChild(div);
+            
+            messages.appendChild(newMessageElement);
+            window.scrollTo(0, document.body.scrollHeight);
+          }
+        }
+        
+        if (message.command == "!color") {
+          if (message.data.failed) {
+            let newMessageElement = document.createElement("li");
+            
+            newMessageElement.style.fontWeight = "bold";
+            newMessageElement.textContent = "SYSTEM: Invalid Hex Code/Color Name"
+            
+            messages.appendChild(newMessageElement);
+            window.scrollTo(0, document.body.scrollHeight);
+          }
+        }
+        
+        if (message.command == "!users") {
+          let newMessageElement = document.createElement("li");
+          
+          let div1 = document.createElement("div");
+          let div2 = document.createElement("div");
+          let div3 = document.createElement("div");
+            
+          newMessageElement.style.fontWeight = "bold";
+          div.textContent = "SYSTEM: Requested by " + message.data.username; 
+          div2.textContent = "There are " + message.data.onlineUsers + " users online in this room.";
+          div3.textContent = "They are :" + message.data.onlineUsersNames;
+          
+          newMessageElement.appendChild("div1");
+          newMessageElement.appendChild("div2");
+          newMessageElement.appendChild("div3");
+          
+          messages.appendChild(newMessageElement);
+          window.scrollTo(0, document.body.scrollHeight);
+        }
+        
+        if (message.command == "!invite") {
+          if (message.data.public) {
+            let newMessageElement = document.createElement("li");
+            
+            let div = document.createElement("div");
+            let div2 = document.createElement("div");
+            let div3 = document.createElement("div");
+            
+            newMessageElement.style.fontWeight = "bold";
+            div2.style.display = "inline-block";
+            div3.style.display = "inline-block";
+            
+            div.textContent = "SYSTEM: Requested by " + message.data.username + ":";
+            div2.textContent = "This is a public room with the name " + message.data.currentRoom + " and the invite link:⠀";
+            
+            div3.innerHTML = "<a href='" + message.data.inviteLink + "'>" + message.data.inviteLink + "</a>";
+            
+            newMessageElement.appendChild(div);
+            newMessageElement.appendChild(div2);
+            newMessageElement.appendChild(div3);
+            
+            messages.appendChild(newMessageElement);
+            window.scrollTo(0, document.body.scrollHeight);
+          } else {
+            let newMessageElement = document.createElement("li");
+            
+            let div = document.createElement("div");
+            let div2 = document.createElement("div");
+            let div3 = document.createElement("div");
+            
+            newMessageElement.style.fontWeight = "bold";
+            div2.style.display = "inline-block";
+            div3.style.display = "inline-block";
+            
+            div.textContent = "SYSTEM: Requested by " + message.data.username + ":";
+            div2.textContent = "This is a room with the name " + message.data.currentRoom + " and the invite link:⠀";
+            
+            div3.innerHTML = "<a href='" + message.data.inviteLink + "'>" + message.data.inviteLink + "</a>";
+            
+            newMessageElement.appendChild(div);
+            newMessageElement.appendChild(div2);
+            newMessageElement.appendChild(div3);
+            
+            messages.appendChild(newMessageElement);
+            window.scrollTo(0, document.body.scrollHeight);
+          }
+        }
+        
+        if (message.command == "disconnect") {
+          let newMessageElement = document.createElement("li");
+            
+          newMessageElement.style.fontWeight = "bold";
+          newMessageElement.textContent = "SYSTEM: " + message.data.username + " has disconnected."
+            
+          messages.appendChild(newMessageElement);
+          window.scrollTo(0, document.body.scrollHeight);
+        }
+        
+        if (message.command == "!setUsername") {
+          let newMessageElement = document.createElement("li");
+            
+          newMessageElement.style.fontWeight = "bold";
+          newMessageElement.textContent = "SYSTEM: " + message.data.oldUsername + " has changed their username to " + message.data.newUsername;
+            
+          messages.appendChild(newMessageElement);
+          window.scrollTo(0, document.body.scrollHeight);
+        }
+      });
+      
+      socket.on("welcomeMessage", function(username) {
+        let newMessageElement = document.createElement("li");
+        
+        newMessageElement.style.fontWeight = "bold";
+        
+        newMessageElement.textContent = "SYSTEM:  Welcome " + username + "! Use !invite to generate an invite link to this room to send to your friends! Use !help to get a list of all commands!"
+        
         messages.appendChild(newMessageElement);
         window.scrollTo(0, document.body.scrollHeight);
       });
