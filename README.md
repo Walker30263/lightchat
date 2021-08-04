@@ -59,6 +59,6 @@
         </table>
 
 ## Contributors
-### Me
+### [@walker30263](https://github.com/walker30263)
 ### [@python9160](https://github.com/python9160)
 ### [@dummiedum](https://github.com/dummiedum)
