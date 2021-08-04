@@ -60,5 +60,5 @@
 
 ## Contributors
 ### Me
-### @python9160
-### @waa!!
+### [@python9160](https://github.com/python9160)
+### [@dummiedum](https://github.com/dummiedum)
