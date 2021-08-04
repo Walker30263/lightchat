@@ -42,11 +42,6 @@
             <td>!users</td>
           </tr>
           <tr>
-            <td>!getUsers</td>
-            <td>User List</td>
-            <td>!getUsers</td>
-          </tr>
-          <tr>
             <td>!color</td>
             <td>Color your message</td>
             <td>!color #00ff00 This message is green!</td>
