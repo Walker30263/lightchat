@@ -4,15 +4,6 @@ const app = express();
 const htmlNameArrays = require("./htmlNameArrays.js")
 
 const colorNamesArray = htmlNameArrays.CSS_COLOR_NAMES;
-const htmlTagsArray = htmlNameArrays.HTML_TAG_LIST;
-
-for (var i = 0; i < colorNamesArray.length; i++) {
-  colorNamesArray[i] = colorNamesArray[i].toLowerCase(); //to make the array lowercase
-}
-
-for (var i = 0; i < htmlTagsArray.length; i++) {
-  htmlTagsArray[i] = "<" + htmlTagsArray[i] + ">"
-}
 
 const http = require("http");
 const server = http.createServer(app);
@@ -26,6 +17,7 @@ const hook = new Webhook(process.env.W_ID_DISCORD); //uses a Discord webhook to 
 
 app.use(express.static("public"));
 
+//Each Room is an array of Members
 var rooms = []; //Array of Rooms
 var roomNames = []; //Array of Room Names
 var roomPasswords = []; //Array of Room Passwords
@@ -33,7 +25,9 @@ var roomInviteCodes = []; //parallel array to hold room invites
 
 var publicRooms = []; //Array of Public Room Names for display purposes
 
-//Each Room is an array of Members
+
+//Defining what a "Member" of a room is:
+//A member has a userid, username, and username color
 let Member = class {
   constructor(userid, username) {
     this.id = userid;
@@ -43,12 +37,18 @@ let Member = class {
 }
 
 
-var willThisWork = 0;
+
+
+// Ignore this
+// this uses up a lot of resources, you know?
+var uptime = 0;
 
 setInterval(function() {
-  willThisWork++;
-  console.log("Up for " + willThisWork + " seconds.")
-}, 1000);
+  uptime++;
+  console.log("Up for " + uptime*5 + " seconds.")
+}, 5000);
+
+//Ignore that, it's just an uptime thing
 
 
 app.get('/', (req, res) => {
@@ -65,18 +65,58 @@ app.get('/invite', (req, res) => {
 
 app.use('/invite/:code', (req, res) => {
   res.redirect("/?inviteCode=" + req.params.code);
-  console.log(req.params.code)
 });
 
 app.get('/games', (req, res) => {
   res.sendFile(__dirname + '/views/games/games.html')
 });
 
+// this was moved here since defining it every time somebody types !help is a waste of resources
+
+const help_message = `
+<table>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+<tr>
+<td>!help</td>
+<td>View Commands</td>
+<td>!help</td>
+</tr>
+<tr>
+<td>!setUsername</td>
+<td>Sets Username</td>
+<td>!setUsername username</td>
+</tr>
+<tr>
+<td>!invite</td>
+<td>Gives you an invite link to the current chat room</td>
+<td>!invite</td>
+</tr>
+<tr>
+<td>!users</td>
+<td>User Count</td>
+<td>!users</td>
+</tr>
+<tr>
+<td>!color</td>
+<td>Color your message</td>
+<td>!color #00ff00 This message is green!</td>
+</tr>
+<tr>
+<td>!setColor</td>
+<td>Sets Username Color</td>
+<td>!setColor crimson</td>
+</tr>
+</table>
+`;
+
 io.on('connection', (socket) => {
   console.log("An user connected!");
   
   socket.on('joinRoom', (joiningRoomName, joiningRoomCode, username) => {
-    console.log("Someone wants to join " + joiningRoomName + " with the password " + joiningRoomCode);
     if (verifyRoomPassword(joiningRoomName, joiningRoomCode)) {
        io.to(socket.id).emit("removeOtherElements");
       let joiner = new Member(socket.id, username);
@@ -84,7 +124,7 @@ io.on('connection', (socket) => {
       
       socket.join(joiningRoomName);
       
-      io.to(joiningRoomName).emit("systemMessage", "A new user connected. Welcome " + getUsername(socket.id) + "! You can do !setUsername (username) to set a username")
+      io.to(joiningRoomName).emit("welcomeMessage", getUsername(socket.id))
       io.to(socket.id).emit("changeTitle", joiningRoomName)
     }
     else {
@@ -93,8 +133,6 @@ io.on('connection', (socket) => {
   });
   
   socket.on("joinRoomWithInvite", (inviteCode, username) => {
-    console.log("Someone wants to join with the invite " + inviteCode);
-    
     var index = roomInviteCodes.indexOf(inviteCode);
     var joiningRoomName = roomNames[index];
     
@@ -105,13 +143,11 @@ io.on('connection', (socket) => {
       
     socket.join(joiningRoomName);
       
-    io.to(joiningRoomName).emit("systemMessage", "A new user connected. Welcome " + getUsername(socket.id) + "! You can do !setUsername (username) to set a username.")
+    io.to(joiningRoomName).emit("welcomeMessage", getUsername(socket.id))
     io.to(socket.id).emit("changeTitle", joiningRoomName)
   })
   
   socket.on("makeRoom", (roomName, roomPassword, username) => {
-    console.log("Someone wants to make a room with the name " + roomName + " and password " + roomPassword);
-    
     if (roomNames.includes(roomName)) {
       io.to(socket.id).emit("errorAlert", "A room with that name already exists. Pick a new name.")
       return;
@@ -135,12 +171,10 @@ io.on('connection', (socket) => {
     
     io.to(socket.id).emit("removeOtherElements");
     io.to(socket.id).emit("changeTitle", roomName);
-    io.to(roomName).emit("systemMessage", "Welcome " + getUsername(socket.id) + "! You can do !setUsername (username) to set a username. You can do !invite to get an invite link to share to your friends!");
+    io.to(roomName).emit("welcomeMessage", getUsername(socket.id));
   });
   
   socket.on("makePublicRoom", (roomName, username) => {
-    console.log("Someone wants to make a public room with the name " + roomName);
-    
     if (roomNames.includes(roomName)) {
       io.to(socket.id).emit("errorAlert", "A room with that name already exists. Pick a new name.")
       return;
@@ -161,130 +195,162 @@ io.on('connection', (socket) => {
     socket.join(roomName);
     io.to(socket.id).emit("removeOtherElements");
     io.to(socket.id).emit("changeTitle", roomName)
-    io.to(roomName).emit("systemMessage", "Welcome " + getUsername(socket.id) + "! You can do !setUsername (username) to set a username. You can do !invite to get an invite link to share to your friends!");
+    io.to(roomName).emit("welcomeMessage", getUsername(socket.id));
     io.emit("addRoomToList", roomName);
   });
   
   socket.on("newMessage", (message, content) => {
     const currentRoom = getRoomName(socket.id);
+    const message_words = message.split(" ");
+    const first_word_in_message = message_words[0];
     
-    const parts = message.split(" ");
     
-    if (parts[0] == "!setUsername") {
-      const oldUsername = getUsername(socket.id);
-      const newUsername = message.split(" ").slice(1).join(" ");
-      
-      changeUsername(socket.id, newUsername);
-      io.to(currentRoom).emit("systemMessage", oldUsername + " has changed their username to " + newUsername);
-    } 
-    else if (parts[0] == "!invite") {
-      if (publicRooms.includes(currentRoom)) {
-        io.to(currentRoom).emit("systemMessage", "Requested by " + usernameDisplay(socket.id) + ":<br>This is a public room with the name " + currentRoom + " and the invite link is " + getInviteLinkFromRoomName(currentRoom) + ".")
-      } 
-      else if ((publicRooms.includes(currentRoom) == false) && (roomNames.includes(currentRoom) == true)) {
-        io.to(currentRoom).emit("systemMessage", "Requested by " + usernameDisplay(socket.id) + ":<br>The room name is " + currentRoom + " and the room's invite link is " + getInviteLinkFromRoomName(currentRoom))
+      switch (first_word_in_message) {
+        case "!setUsername":
+          const oldUsername = getUsername(socket.id);
+          const newUsername = message
+            .split(" ")
+            .slice(1)
+            .join(" ");
+          changeUsername(socket.id, newUsername);
+          io.to(currentRoom).emit("systemMessage", {
+            command: "!setUsername",
+            data: {
+              newUsername: newUsername,
+              oldUsername: oldUsername
+            }
+          })
+          break;
+        case "!invite":
+          if (publicRooms.includes(currentRoom)) {
+            io.to(currentRoom).emit(
+              "systemMessage",
+              {
+                command: "!invite",
+                data: {
+                  username: getUsername(socket.id),
+                  currentRoom: currentRoom,
+                  inviteLink: getInviteLinkFromRoomName(currentRoom),
+                  public: true
+                }
+              }
+            );
+          } else if (
+            publicRooms.includes(currentRoom) == false &&
+            roomNames.includes(currentRoom) == true
+          ) {
+            io.to(currentRoom).emit(
+              "systemMessage",
+              {
+                command: "!invite",
+                data: {
+                  username: getUsername(socket.id),
+                  currentRoom: currentRoom,
+                  inviteLink: getInviteLinkFromRoomName(currentRoom),
+                  public: false
+                }
+              }
+            );
+          }
+          break;
+        case "!users":
+          io.to(currentRoom).emit(
+            "systemMessage",
+            {
+              command: "!users",
+              data: {
+                username: getUsername(socket.id),
+                onlineUsers: getOnlineUsers(currentRoom),
+                onlineUsersNames: getOnlineUsersNames(currentRoom).join(", ")
+              }
+            }
+          );
+          break;
+        case "!color":
+          if (fixColor(message_words[1]) == false) {
+            io.to(socket.id).emit(
+              "systemMessage", {
+                command: "!color",
+                data: {
+                  failed: true
+                }
+              }
+            );
+          } else {
+            io.to(currentRoom).emit(
+              "newMessage",
+              message_words.slice(2).join(" "), {
+                usernameColor: getUsernameColor(socket.id),
+                username: getUsername(socket.id),
+                messageColor: fixColor(message_words[1])
+              }
+            );
+          }
+          break;
+        case "!setColor":
+          var newColor = message_words[1];
+          if (fixColor(newColor) == false) {
+            io.to(socket.id).emit(
+              "systemMessage",
+              {
+                command: "!setColor",
+                data: {
+                  username: getUsername(socket.id),
+                  newColor: fixColor(newColor),
+                  failed: true
+                }
+              }
+            );
+          } else {
+            changeUsernameColor(socket.id, fixColor(newColor));
+            io.to(currentRoom).emit(
+              "systemMessage", {
+                command: "!setColor",
+                data: {
+                  username: getUsername(socket.id),
+                  newColor: fixColor(newColor),
+                  failed: false
+                }
+              }
+            );
+          }
+          break;
+        case "!help":
+          io.to(currentRoom).emit(
+            "systemMessage",
+            {
+              command: "!help",
+              data: {
+                username: getUsername(socket.id),
+                helpMessage: help_message
+              } 
+            }
+          );
+          break;
+        default:
+          io.to(currentRoom).emit("newMessage", message, {
+            usernameColor: getUsernameColor(socket.id),
+            username: getUsername(socket.id),
+            messageColor: "#fff"
+          });
+          break;
       }
-    }
-    else if (parts[0] == "!users") {
-      io.to(currentRoom).emit("systemMessage", "Requested by " + usernameDisplay(socket.id) + ":<br>There are " + getOnlineUsers(currentRoom) + " users on in this room.")
-    }
-    else if (parts[0] == "!color") {
-      if (fixColor(parts[1]) == false) {
-        io.to(socket.id).emit("systemMessage", "Invalid Hex color/color name")
-      } else {
-        io.to(currentRoom).emit("newMessage", usernameDisplay(socket.id) + ": " + "<span class='content' style='color: " + fixColor(parts[1]) + ";'><b>" + parts.slice(2).join(" ") + "</b></span>", parts.slice(2).join(" "));
-      }
-    } 
-    else if (message.includes("<script>")) {
-      io.to(currentRoom).emit("systemMessage", "<span style='color:red; font-weight:bold;'>" + getUsername(socket.id) + " Sent a message which contained the script tag</span>");
-    } 
-    /*else if (checkInputForHTML(parts)) {
-      io.to(currentRoom).emit("systemMessage", "Stop trying to be cool and embed HTML into the chat, " + usernameDisplay(socket.id) + "!")
-    }*/
-    else if (parts[0] == "!getUsers") {
-      io.to(currentRoom).emit("systemMessage", "The Users are: "+ getOnlineUsersNames(currentRoom).join(', '))
-    }
-    else if (parts[0] == "!setColor") {
-      var newColor = parts[1];
-      const regex = new RegExp('^#(?:[0-9a-fA-F]{3}){1,2}$');
-      
-      if (fixColor(newColor) == false) {
-        io.to(socket.id).emit("systemMessage", "Invalid Hex color/color name");
-      } else {
-        changeUsernameColor(socket.id, fixColor(newColor));
-        io.to(currentRoom).emit("systemMessage", getUsername(socket.id) + " changed their username color to " + fixColor(newColor));
-      } 
-    } 
-    else if (parts[0] == "!help") {
-      var returnval = `
-        <table>
-          <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Example</th>
-          </tr>
-          <tr>
-            <td>!help</td>
-            <td>View Commands</td>
-            <td>!help</td>
-          </tr>
-          <tr>
-            <td>!setUsername</td>
-            <td>Sets Username</td>
-            <td>!setUsername username</td>
-          </tr>
-          <tr>
-            <td>!invite</td>
-            <td>Gives you an invite link to the current chat room</td>
-            <td>!invite</td>
-          </tr>
-          <tr>
-            <td>!users</td>
-            <td>User Count</td>
-            <td>!users</td>
-          </tr>
-          <tr>
-            <td>!getUsers</td>
-            <td>User List</td>
-            <td>!getUsers</td>
-          </tr>
-          <tr>
-            <td>!color</td>
-            <td>Color your message</td>
-            <td>!color #00ff00 This message is green!</td>
-          </tr>
-          <tr>
-            <td>!setColor</td>
-            <td>Sets Username Color</td>
-            <td>!setColor crimson</td>
-          </tr>
-        </table>
-      `;
-      
-      io.to(currentRoom).emit("systemMessage", "Requested by " + usernameDisplay(socket.id) + ": <br>" + returnval);
-    }
-    else {
-      var finalMessage = usernameDisplay(socket.id) + ": " + "<span class='content'>" + message + "</span>";
-      io.to(currentRoom).emit("newMessage", finalMessage, message);
-    }
-    
     socket.to(currentRoom).emit("ping");
   });
   
   socket.on('disconnect', () => {
     const currentRoom = getRoomName(socket.id);
-    io.to(currentRoom).emit("systemMessage", getUsername(socket.id) + " has disconnected.")
+    io.to(currentRoom).emit("systemMessage", {
+      command: "disconnect",
+      data: {
+        username: getUsername(socket.id)
+      }
+    })
     removeFromRoom(socket.id);
     if (getOnlineUsers(currentRoom) == 0) {
       deleteRoom(currentRoom);
     }
     io.emit("getPublicRooms")
-  });
-  
-  socket.on("displayRooms", () => {
-    console.log(rooms);
-    console.log(roomNames);
-    console.log(roomPasswords);
   });
   
   socket.on("getPublicRooms", () => {
@@ -357,8 +423,8 @@ function getRoomName(id) {
 }
 
 function changeUsername(id, newUsername) {
-  for (var i = 0; i < rooms.length; i++) {
-    for (var j = 0; j < rooms[i].length; j++) {
+  for (let i = 0; i < rooms.length; i++) {
+    for (let j = 0; j < rooms[i].length; j++) {
       if (rooms[i][j].id == id) {
         rooms[i][j].username = newUsername;
       }
@@ -367,8 +433,8 @@ function changeUsername(id, newUsername) {
 }
 
 function changeUsernameColor(id, newColor) {
-  for (var i = 0; i < rooms.length; i++) {
-    for (var j = 0; j < rooms[i].length; j++) {
+  for (let i = 0; i < rooms.length; i++) {
+    for (let j = 0; j < rooms[i].length; j++) {
       if (rooms[i][j].id == id) {
         rooms[i][j].usernameColor = newColor;
       }
@@ -387,7 +453,7 @@ function getOnlineUsersNames(rn) {
   var index = roomNames.indexOf(rn);
   var usernames = [];
   if (rooms[index]) {
-    for (var i = 0; i < rooms[index].length; i++) {
+    for (let i = 0; i < rooms[index].length; i++) {
       usernames.push(rooms[index][i].username);
     }
   }
@@ -395,8 +461,8 @@ function getOnlineUsersNames(rn) {
 }
 
 function removeFromRoom(id) {
-  for (var i = 0; i < rooms.length; i++) {
-    for (var j = 0; j < rooms[i].length; j++) {
+  for (let i = 0; i < rooms.length; i++) {
+    for (let j = 0; j < rooms[i].length; j++) {
       if (rooms[i][j].id == id) {
         rooms[i].splice(j, 1);
       }
@@ -437,22 +503,9 @@ function fixColor(color) {
   }
 }
 
-function usernameDisplay(socketid) {
-  return "<span class='name' style='color:" + getUsernameColor(socketid) + ";'>" + getUsername(socketid) + "</span>";
-}
-
-function checkInputForHTML(words) {
-  for (i = 0; i < words.length; i++) {
-    if (htmlTagsArray.includes(words[i])) {
-      return true;
-    }
-  }
-  return false;
-}
-
 function generateInviteCode() {
   var code = "";
-  for (i = 0; i < 6; i++) {
+  for (let i = 0; i < 6; i++) {
     if (Math.random() > 0.5) {
       code += (Math.floor(Math.random()*9) + 1)
     } else {
@@ -468,5 +521,5 @@ function generateInviteCode() {
 
 function getInviteLinkFromRoomName(rn) {
   var index = roomNames.indexOf(rn);
-  return "<a href='https://lightchat.tk/invite/" + roomInviteCodes[index] + "'>https://lightchat.tk/invite/" + roomInviteCodes[index] + "</a>";
+  return "https://lightchat.tk/invite/" + roomInviteCodes[index];
 }
