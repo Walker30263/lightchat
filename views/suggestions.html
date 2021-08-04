@@ -32,6 +32,16 @@
         Suggest a new LightChat feature!
       </h1>
     </div>
+    <noscript>
+      <div class="javascriptNotEnabledWarning">
+        <span style="font-size: 64px;">You don't have JavaScript enabled.</span>
+        <br>
+        <span style="font-size: 30px;">Since this uses JavaScript to send/receive messages from the server, you won't be able to use it until you enable JavaScript.</span>
+      </div>
+      <style type="text/css">
+        #sugFormContainer { display:none; }
+      </style>
+    </noscript>
     <div id="sugFormContainer">
       <form id="suggestionsForm" action="/suggestions">
         Give us a way to contact you if needed (such as your Discord username)
@@ -59,8 +69,8 @@
       suggestionsForm.addEventListener("submit", function(e) {
         e.preventDefault();
         
-        var contact = document.getElementById("contact").value || "Didn't give anything"; //how bout smth that says ayo actually type somthing lol like on the page
-        var suggestion = document.getElementById("suggestion").value;                      //eh i made the suggestion required not the contact info
+        var contact = document.getElementById("contact").value || "Didn't give anything";
+        var suggestion = document.getElementById("suggestion").value;
         
         socket.emit("suggestion", contact, suggestion);
         
