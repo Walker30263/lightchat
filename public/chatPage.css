@@ -2,7 +2,8 @@
 
 #chatElementsContainer {
   display: block;
-  background: linear-gradient(180deg, #4b6cb7 0%, #182848 100%);
+/*   background: linear-gradient(180deg, #4b6cb7 0%, #182848 100%); */
+  background-color: #232354;
   border: none;
   box-shadow: 0px 0px 10px #4b6cb7;
 }
@@ -12,7 +13,8 @@
 }
 
 body {
-  background: linear-gradient(90deg, #1CB5E0 0%, #000851 100%);
+/*   background: linear-gradient(90deg, #1CB5E0 0%, #000851 100%); */
+  backround-color: #050510;
 }
 
 /* width */
