@@ -11,10 +11,6 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
-const { Webhook, MessageBuilder } = require('discord-webhook-node');
-const hook = new Webhook(process.env.W_ID_DISCORD); //uses a Discord webhook to send suggestions to the developers
-//if you're recreating this, put the webhook link instead of "process.env.W_ID_DISCORD", or make a .env with W_ID_DISCORD set to the link
-
 app.use(express.static("public"));
 
 //Each Room is an array of Members
@@ -365,6 +361,10 @@ io.on('connection', (socket) => {
   });
   
   socket.on("suggestion", (contact, suggestion) => {
+    const { Webhook, MessageBuilder } = require('discord-webhook-node');
+    const hook = new Webhook(process.env.W_ID_DISCORD); //uses a Discord webhook to send suggestions to the developers
+    //if you're recreating this, put the webhook link instead of "process.env.W_ID_DISCORD", or make a .env with W_ID_DISCORD set to the link
+    
     const embed = new MessageBuilder()
       .setTitle("New Suggestion")
       .setColor("#FF00FF")
