@@ -376,8 +376,8 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(3000, () => {
-  console.log("Listening on 3000");
+server.listen(process.env.port || 3000, () => {
+  console.log("Up!");
 });
 
 
