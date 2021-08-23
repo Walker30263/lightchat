@@ -1,0 +1,47 @@
+#makePublicPermanentRoom > button {
+  background-color: darkblue;
+  border-radius: 5px;
+  border: solid darkblue 1px;
+  color: white;
+  padding: 5px 16px;
+  margin-top: 2.5vw;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+}
+
+#makePublicPermanentRoom > button:hover {
+  background-color: #00006F;
+}
+
+#publicPermanentRoomList > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 5px;
+  background: linear-gradient(90deg, rgba(113,82,105,1) 0%, rgba(152,152,152,1) 100%);
+}
+
+#publicPermanentRoomList > div > button {
+  margin-left: 5vw;
+  background-color: green;
+  border-radius: 5px;
+  border: solid darkblue 1px;
+  color: white;
+  padding: 5px 16px;
+  text-align: center;
+  display: inline;
+  font-size: 16px;
+  float: right;
+}
+
+#publicPermanentRooms {
+  text-align: center;
+}
+
+#publicPermanentRooms > h4 {
+  text-align: center;
+  text-decoration: bold;
+}

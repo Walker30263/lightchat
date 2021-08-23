@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="stylesheet" type="text/css" href="/permanentRooms.css" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="idk" />
+
+    <meta property="og:title" content="LightChat" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lightchat.tk" />
+    <meta property="og:description" content="A simple real-time chat app!" />
+    <meta
+      property="og:image"
+      content="https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fa4ee71f481b6445da1cf88f8e4cd3983.png?v=1626225572793"
+    />
+    <meta name="theme-color" content="#66C0FF" />
+
+    <link
+      rel="icon"
+      type="image/png"
+      href="https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fa4ee71f481b6445da1cf88f8e4cd3983%20(1).png?v=1626225577574"
+    />
+    
+
+    <title>LightChat</title>
+  </head>
+  <body>
+    <div id="chatElementsContainer">
+      <ul id="messages"></ul>
+      <form id="messageForm" action="IF_UR_SEEING_THIS_WE_MESSED_UP">
+        <input id="messageInput" autocomplete="off" />
+        <!--         <input id="fileInput" type="file" style="display: none;">
+        <label for="fileInput" id="fileInputIcon">
+          <img src="https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fupload.png?v=1626307184837">
+        </label> -->
+        <button>Send</button>
+      </form>
+    </div>
+    <div id="info">
+      <h1 id="top">
+        Warning! Experimental Features Ahead<br>
+      </h1>
+    </div>
+    <noscript>
+      <div class="javascriptNotEnabledWarning">
+        <span style="font-size: 64px;">You don't have JavaScript enabled.</span>
+        <br>
+        <span style="font-size: 30px;">Since this uses JavaScript to send/receive messages from the server, you won't be able to use it until you enable JavaScript.</span>
+      </div>
+      <style type="text/css">
+        #chatElementsContainer { display:none; }
+        #joinViaInvite { display:none; }
+        #joinOrMake { display:none; }
+      </style>
+    </noscript>
+    
+    <div class="flex-container" id="joinOrMake">
+      <div>
+        <b>Enter Username:</b><br />
+        <input id="username" />
+      </div>
+      <br />
+      
+      <div class="flex-container-publicRooms">
+        <div>
+          <b>Make Permanent Public Room</b>
+          <form id="makePublicPermanentRoom" action="/">
+            What do you want to name the permanent public room?
+            <input id="publicPermanentRoomName" autocomplete="off" /><br />
+            <button>Make Permanent Public Room</button>
+          </form>
+        </div>
+        <div id="publicPermanentRooms">
+          <h4>
+            Public Rooms
+          </h4>
+          <ul id="publicPermanentRoomList"></ul>
+        </div>
+      </div>
+    </div>
+
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var ping = new Audio(
+        "https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fding.wav?v=1626265227101"
+      );
+      
+      var socket = io();
+      
+      var makePublicPermanentRoom = document.getElementById("makePublicPermanentRoom");
+      
+      makePublicPermanentRoom.addEventListener("submit", function(e) {
+        e.preventDefault();
+        var publicPermanentRoomName = document.getElementById("publicPermanentRoomName").value;
+        var username = document.getElementById("username").value || "Unnamed";
+        if (document.getElementById("username").value) {
+          localStorage.removeItem("username");
+          localStorage.setItem(
+            "username",
+            document.getElementById("username").value
+          );
+        }
+        
+        socket.emit("makePermanentPublicRoom", publicPermanentRoomName, username);
+        document.getElementById("publicPermanentRoomName").value = "";
+        document.getElementById("username").value = "";
+      });
+      
+      socket.on("redirectToRoom", function(roomName) {
+        document.location = "https://lightchat.tk/permanent/" + roomName
+      });
+    </script>
+  </body>
+</html>

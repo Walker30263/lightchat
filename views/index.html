@@ -122,6 +122,10 @@
       
       var inviteCode = "";
       
+      if (localStorage.getItem("allowsNotifs") === null) {
+        localStorage.setItem("allowsNotifs", "false");
+      }
+      
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.has('inviteCode')) {
         inviteCode = urlParams.get('inviteCode');
@@ -269,7 +273,7 @@
         ul.appendChild(div);
       });
 
-      socket.on("newMessage", function(message, displayOptions) {
+      socket.on("newMessage", function(message, displayOptions, socketId) {
         let newMessageElement = document.createElement("li");
         let messageDiv = document.createElement("div");
         let usernameDiv = document.createElement("div");
@@ -294,6 +298,10 @@
         console.log(newMessageElement.innerHTML);
         messages.appendChild(newMessageElement);
         window.scrollTo(0, document.body.scrollHeight);
+        
+        if (Notification.permission === "granted" && socketId !== socket.id && !isOnTab && (localStorage.getItem("allowsNotifs") == "true")) {
+          new Notification(displayOptions.username, { body: message, icon: "https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fa4ee71f481b6445da1cf88f8e4cd3983.png?v=1626225572793" });
+        }
       });
 
       socket.on("ping", function() {
@@ -460,9 +468,36 @@
       messageForm.addEventListener("submit", function(e) {
         e.preventDefault();
         if (messageInput.value) {
+          if (messageInput.value.toLowerCase() === "!notifs") {
+            // function to actually ask the permissions
+            function handlePermission(permission) {
+              // set the button to shown or hidden, depending on what the user answers
+              if(Notification.permission === 'denied' || Notification.permission === 'default') {
+                alert("Wrong button!")
+              } else {
+                if (localStorage.getItem("allowsNotifs") == "false") {
+                  localStorage.setItem("allowsNotifs", "true")
+                  
+                  new Notification("Lightchat", { body: "This is a Notification", icon: "https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fa4ee71f481b6445da1cf88f8e4cd3983.png?v=1626225572793" });
+                } else if (localStorage.getItem("allowsNotifs") == "true") {
+                  localStorage.setItem("allowsNotifs", "false");
+                  new Notification("Lightchat", { body: "You will not receive any more notifications", icon: "https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fa4ee71f481b6445da1cf88f8e4cd3983.png?v=1626225572793" });
+                }
+              }
+            }
+
+            // Let's check if the browser supports notifications
+            if (!('Notification' in window)) {
+              alert("This browser does not support notifications.");
+            } else {
+                Notification.requestPermission(function(permission) {
+                  handlePermission(permission);
+                });
+              }
+            }
+          }
           socket.emit("newMessage", messageInput.value, messageInput.value);
           messageInput.value = "";
-        }
       });
 
       socket.on("outputRoomNameFromInvite", function(roomName) {
@@ -477,11 +512,14 @@
             }
             else {
               clearInterval(countdown);
-              document.location = "https://lightchat.tk"
+              document.location = window.loacation.hostname;
             }
             x--;
           }, 1000)
         } else {
+          
+          // hide the loading screen
+          
           document.getElementById('joinViaInvite').style.display = "flex";
           document.getElementById("youHaveBeenInvited").innerHTML = "You have been invited to the room <b>" + roomName + "</b><br>" + "Set your username and then click the \"Join\" button to join."; 
         } 
