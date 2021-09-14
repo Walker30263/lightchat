@@ -1,6 +1,6 @@
-# [lightchat](https://lightchat.tk)
+# [lightchat](https://lightchat.ml)
 
-# [Suggest a new feature](https://lightchat.tk/suggestions)
+# [Suggest a new feature](https://lightchat.ml/suggestions)
 
 ## New: XSS/Arbitary Code Execution prevention
 ### Before this update, people could use HTML in their messages. This led to people being able to use the script tag and the style tag to change stuff like background color of LightChat on all clients connected to a room. 
@@ -9,7 +9,7 @@
 ## Lightweight real-time chat app made with node.js and socket.io
 ### Public and Private chat rooms that you can make and join
 ### Invite links!
-#### In the format https://lightchat.tk/invite/{invite-code}
+#### In the format https://lightchat.ml/invite/{invite-code}
 ### Simple UI
 ![](https://github.com/Walker30263/lightchat/blob/main/assets/ui-screenshots/ui_v1-1.png?raw=true)
 ![](https://github.com/Walker30263/lightchat/blob/main/assets/ui-screenshots/chat-ui_v1-1.png?raw=true)

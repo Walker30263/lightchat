@@ -36,19 +36,12 @@ let Member = class {
   }
 }
 
-
-
-
-// Ignore this
-// this uses up a lot of resources, you know?
 var uptime = 0;
 
 setInterval(function() {
   uptime++;
-  console.log("Up for " + uptime*5 + " seconds.")
-}, 5000);
-
-//Ignore that, it's just an uptime thing
+  console.log("Up for " + uptime + " minutes.")
+}, 60000);
 
 
 app.get('/', (req, res) => {
@@ -526,5 +519,5 @@ function generateInviteCode() {
 
 function getInviteLinkFromRoomName(rn) {
   var index = roomNames.indexOf(rn);
-  return "https://lightchat.tk/invite/" + roomInviteCodes[index];
+  return "https://lightchat.ml/invite/" + roomInviteCodes[index];
 }
