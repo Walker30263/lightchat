@@ -6,6 +6,8 @@
 ### Before this update, people could use HTML in their messages. This led to people being able to use the script tag and the style tag to change stuff like background color of LightChat on all clients connected to a room. 
 ### We restructured the way we handle messages, and as a result, all HTML in messages is treated as plain text, making this "hack" impossible.
 
+We're going back to [the old url](https://chatlight.glitch.me) because the new one's blocked on school wifi 😀
+
 ## Lightweight real-time chat app made with node.js and socket.io
 ### Public and Private chat rooms that you can make and join
 ### Invite links!
