@@ -1,0 +1,11 @@
+TODO:
+
+[ ] Add a sidebar
+
+[ ] Add a "Leave Room" button (Redirect to window.location.hostname)
+
+[ ] Find the cause of high CPU errors
+ 
+[ ] Add Loading Screen on Join Via Invite loading page (the div stays empty for a few seconds for invalid links)
+
+[ ] Fix !users

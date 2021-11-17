@@ -36,12 +36,15 @@ let Member = class {
   }
 }
 
+
+
+
+// Ignore this
 var uptime = 0;
 
 setInterval(function() {
   uptime++;
-  console.log("Up for " + uptime + " minutes.")
-}, 60000);
+}, 1000);
 
 
 app.get('/', (req, res) => {
@@ -114,7 +117,7 @@ const help_message = `
 io.on('connection', (socket) => {
   console.log("An user connected!");
   
-  socket.on('joinRoom', (joiningRoomName, joiningRoomCode, username) => {
+  socket.on('joinRoom', (joiningRoomName, joiningRoomCode, username) => { // JWUP (Join Via Username/Pwd)
     if (verifyRoomPassword(joiningRoomName, joiningRoomCode)) {
        io.to(socket.id).emit("removeOtherElements");
       let joiner = new Member(socket.id, username);
@@ -130,7 +133,7 @@ io.on('connection', (socket) => {
     }
   });
   
-  socket.on("joinRoomWithInvite", (inviteCode, username) => {
+  socket.on("joinRoomWithInvite", (inviteCode, username) => { // JVI (Join Via Invite)
     var index = roomInviteCodes.indexOf(inviteCode);
     var joiningRoomName = roomNames[index];
     
@@ -145,7 +148,7 @@ io.on('connection', (socket) => {
     io.to(socket.id).emit("changeTitle", joiningRoomName)
   })
   
-  socket.on("makeRoom", (roomName, roomPassword, username) => {
+  socket.on("makeRoom", (roomName, roomPassword, username) => { // Create room
     if (roomNames.includes(roomName)) {
       io.to(socket.id).emit("errorAlert", "A room with that name already exists. Pick a new name.")
       return;
@@ -251,19 +254,6 @@ io.on('connection', (socket) => {
             );
           }
           break;
-        case "!users":
-          io.to(currentRoom).emit(
-            "systemMessage",
-            {
-              command: "!users",
-              data: {
-                username: getUsername(socket.id),
-                onlineUsers: getOnlineUsers(currentRoom),
-                onlineUsersNames: getOnlineUsersNames(currentRoom).join(", ")
-              }
-            }
-          );
-          break;
         case "!color":
           if (fixColor(message_words[1]) == false) {
             io.to(socket.id).emit(
@@ -287,7 +277,7 @@ io.on('connection', (socket) => {
           break;
         case "!setColor":
           var newColor = message_words[1];
-          if (fixColor(newColor) == false) {
+          if (false) {
             io.to(socket.id).emit(
               "systemMessage",
               {
@@ -324,6 +314,21 @@ io.on('connection', (socket) => {
               } 
             }
           );
+          break;
+        case "!users":
+          let room = roomNames[rooms.indexOf(currentRoom)];
+          
+          io.to(currentRoom).emit(
+            "systemMessage",
+            {
+              command: "!users",
+              data: {
+                onlineUsers: getOnlineUsers(room),
+                onlineUsersNames: getOnlineUsersNames(room).join(", "),
+                username: getUsername(socket.id)
+              }
+            }
+          )
           break;
         default:
           io.to(currentRoom).emit("newMessage", message, {
@@ -372,9 +377,13 @@ io.on('connection', (socket) => {
     
     hook.send(embed);
   });
+  
+  socket.on("uptime", (un) => {
+    console.log(`${un} says hi!`);
+  });
 });
 
-server.listen(process.env['PORT'], () => {
+server.listen(process.env.PORT || 3000, () => {
   console.log("Up!");
 });
 
@@ -445,6 +454,8 @@ function getOnlineUsers(rn) {
   if (rooms[index]) {
     return rooms[index].length;
   }
+  
+  return 0;
 }
 
 function getOnlineUsersNames(rn) {
@@ -481,6 +492,11 @@ function deleteRoom(rn) {
 
 function fixColor(color) {
   const regex = new RegExp('^#(?:[0-9a-fA-F]{3}){1,2}$');
+  
+  if (typeof color !== 'string') {
+    return false
+  }
+  
   if (colorNamesArray.includes(color.toLowerCase())) {
     return color;
   } else if (color.charAt(0) != "#") {
@@ -519,5 +535,5 @@ function generateInviteCode() {
 
 function getInviteLinkFromRoomName(rn) {
   var index = roomNames.indexOf(rn);
-  return "https://lightchat.ml/invite/" + roomInviteCodes[index];
+  return "https://lightchat.tk/invite/" + roomInviteCodes[index];
 }
