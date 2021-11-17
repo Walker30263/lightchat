@@ -1,4 +1,4 @@
-# [lightchat](https://lightchat.ml)
+# [lightchat](https://lightchat.ml) or [lightchat for school](https://chatlight.glitch.me)
 
 # [Suggest a new feature](https://lightchat.ml/suggestions)
 
