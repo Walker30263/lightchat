@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="idk" />
+    <meta name="description" content="A simple real-time chat app! Create public or private rooms with invite links to make rooms in which you can talk to your friends!" />
 
     <meta property="og:title" content="LightChat" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://lightchat.tk" />
+    <meta property="og:url" content="https://lightchat.ml" />
     <meta property="og:description" content="A simple real-time chat app!" />
     <meta
       property="og:image"
@@ -111,19 +111,14 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      
       var ping = new Audio(
         "https://cdn.glitch.com/11998fd5-409b-4fca-a81b-3327324e7c93%2Fding.wav?v=1626265227101"
       );
       
       var socket = io();
-      
-      window.setInterval(() => {
-        socket.emit("uptime", socket.id);
-      }, 60000)
       
       var inviteCode = "";
       
@@ -373,8 +368,6 @@
         if (message.command == "!users") {
           let newMessageElement = document.createElement("li");
           
-          let divwrap = document.createElement("div");
-          
           let div1 = document.createElement("div");
           let div2 = document.createElement("div");
           let div3 = document.createElement("div");
@@ -384,11 +377,9 @@
           div2.textContent = "There are " + message.data.onlineUsers + " users online in this room.";
           div3.textContent = "They are :" + message.data.onlineUsersNames;
           
-          divwrap.appendChild("div1");
-          divwrap.appendChild("div2");
-          divwrap.appendChild("div3");
-          
-          newMessageElement.appendChild(divwrap);
+          newMessageElement.appendChild("div1");
+          newMessageElement.appendChild("div2");
+          newMessageElement.appendChild("div3");
           
           messages.appendChild(newMessageElement);
           window.scrollTo(0, document.body.scrollHeight);
@@ -476,9 +467,6 @@
 
       messageForm.addEventListener("submit", function(e) {
         e.preventDefault();
-        
-        if (messageInput.value.trim().length === 0) return;
-        
         if (messageInput.value) {
           if (messageInput.value.toLowerCase() === "!notifs") {
             // function to actually ask the permissions
