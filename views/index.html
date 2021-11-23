@@ -494,10 +494,11 @@
                   handlePermission(permission);
                 });
               }
+            
             }
-          }
           socket.emit("newMessage", messageInput.value, messageInput.value);
           messageInput.value = "";
+          }
       });
 
       socket.on("outputRoomNameFromInvite", function(roomName) {
