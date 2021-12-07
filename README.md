@@ -1,4 +1,4 @@
-# [lightchat.ml](https://lightchat.ml) or [Glitch Server](https://chatlight.glitch.me)
+# [lightchat.ml](https://lightchat.ml) or [Glitch Server (🏫)](https://chatlight.glitch.me)
 ### LightChat is hosted on both repl.it and Glitch. The repl.it-hosted link (recommended) is [lightchat.ml](https://lightchat.ml) 
 
 # [Suggest a new feature](https://lightchat.ml/suggestions)
