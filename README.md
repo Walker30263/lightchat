@@ -1,6 +1,8 @@
-# [lightchat.ml](https://lightchat.ml)
+# As of 2023, [LightChat](https://lightchat.walker30263.repl.co/) has been officially sunsetted by the original developers. It will still be available through [repl.it](https://lightchat.walker30263.repl.co/), but no longer on lightchat.ml
 
-# [Suggest a new feature](https://lightchat.ml/suggestions)
+### This was one of our first projects that was actually used by people on the Internet whom we didn't know personally (mainly middle schoolers who wanted to text their friends during class on their Chromebooks 💀💀), and it made us get into web development as a hobby. Thank you to everyone who supported lightchat.ml in the past by using it, or by contributing suggestions or code. We will still keep this GitHub repository public for the memories.
+
+# All of the code here still works, so feel free to host it on your own and continue LightChat's legacy! (You might need to edit instances of "lightchat.ml" in the code with your own custom domain.)
 
 ## New: XSS/Arbitary Code Execution prevention
 ### Before this update, people could use HTML in their messages. This led to people being able to use the script tag and the style tag to change stuff like background color of LightChat on all clients connected to a room. 
